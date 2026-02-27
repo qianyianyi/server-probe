@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Monitor</title>
+    <title>Server Analytics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -14,543 +14,730 @@
         }
 
         body {
-            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-            background: #0a0a0a;
-            color: #00ff88;
-            line-height: 1.4;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3748;
+            line-height: 1.6;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        .container {
+        .analytics-dashboard {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
         }
 
-        /* 极简头部 */
-        header {
-            border-bottom: 1px solid #1a1a1a;
-            padding: 20px 0;
-            margin-bottom: 30px;
+        /* 头部 */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
         }
 
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .dashboard-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .logo {
+        .dashboard-subtitle {
             font-size: 1.2rem;
-            font-weight: 600;
-            color: #00ff88;
+            opacity: 0.9;
+            font-weight: 300;
         }
 
-        .timestamp {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        /* 控制按钮 */
-        .controls {
+        /* 控制面板 */
+        .control-panel {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
         }
 
-        .btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #00ff88;
-            padding: 8px 16px;
-            font-size: 0.9rem;
+        .control-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        .btn:hover {
-            background: #222;
-            border-color: #00ff88;
-        }
-
-        /* 核心指标 */
-        .core-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1px;
-            background: #1a1a1a;
-            margin-bottom: 30px;
-            border: 1px solid #1a1a1a;
-        }
-
-        .metric {
-            background: #0a0a0a;
-            padding: 20px;
-            border: 1px solid #1a1a1a;
-        }
-
-        .metric-label {
-            font-size: 0.8rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .metric-value {
-            font-size: 1.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 600;
-            color: #00ff88;
-            font-variant-numeric: tabular-nums;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
 
-        .metric-details {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 5px;
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
         }
 
-        /* 进度条 */
-        .progress {
-            height: 4px;
-            background: #1a1a1a;
-            margin-top: 10px;
-            border-radius: 2px;
+        /* 性能指标 */
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-widget {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
             overflow: hidden;
         }
 
-        .progress-bar {
+        .metric-widget:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+        }
+
+        .metric-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .metric-info {
+            flex: 1;
+        }
+
+        .metric-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .metric-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        /* 环形进度条 */
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .progress-ring {
+            width: 100%;
             height: 100%;
-            background: #00ff88;
-            transition: width 0.3s;
+            transform: rotate(-90deg);
         }
 
-        /* 图表区域 */
-        .charts {
+        .progress-ring-circle {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: #667eea;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* 图表网格 */
+        .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1px;
-            background: #1a1a1a;
-            margin-bottom: 30px;
-            border: 1px solid #1a1a1a;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
-        .chart-container {
-            background: #0a0a0a;
-            padding: 20px;
-            border: 1px solid #1a1a1a;
-            height: 200px;
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
         .chart-title {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
         }
 
-        /* 系统信息 */
-        .system-info {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            margin-bottom: 30px;
+        .chart-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
         }
 
-        .info-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #1a1a1a;
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        /* 信息面板 */
+        .info-panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1px;
-            background: #1a1a1a;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
         }
 
         .info-item {
-            background: #0a0a0a;
-            padding: 15px 20px;
-            border: 1px solid #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
         }
 
         .info-label {
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .info-value {
-            font-size: 1rem;
-            color: #00ff88;
-            font-variant-numeric: tabular-nums;
+            font-size: 1.1rem;
+            color: #2d3748;
+            font-weight: 600;
         }
 
-        /* 进程列表 */
-        .processes {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
+        /* 进程表格 */
+        .process-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
         }
 
-        .processes-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #1a1a1a;
+        .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 25px;
         }
 
-        .processes-title {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .processes-table {
+        .process-list {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
 
-        .processes-table th,
-        .processes-table td {
-            padding: 12px 20px;
+        .process-list th,
+        .process-list td {
+            padding: 18px 20px;
             text-align: left;
-            border-bottom: 1px solid #1a1a1a;
-            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .processes-table th {
+        .process-list th {
+            background: #f8fafc;
             font-weight: 600;
-            color: #666;
+            color: #4a5568;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+        }
+
+        .process-list tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .processes-table tr:last-child td {
-            border-bottom: none;
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
         }
 
-        .processes-table tr:hover {
-            background: #1a1a1a;
+        .status-inactive {
+            background: #fed7d7;
+            color: #742a2a;
         }
 
-        /* 状态指示 */
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-online {
-            background: #00ff88;
-        }
-
-        .status-offline {
-            background: #ff4444;
+        .animate-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* 响应式 */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-panels {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
-            .core-metrics {
+            .performance-metrics {
                 grid-template-columns: 1fr;
             }
             
-            .charts {
-                grid-template-columns: 1fr;
+            .analytics-dashboard {
+                padding: 20px;
             }
             
-            .info-grid {
-                grid-template-columns: 1fr;
+            .dashboard-title {
+                font-size: 2.2rem;
             }
-            
-            .container {
-                padding: 15px;
-            }
-        }
-
-        /* 闪烁动画 */
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .blink {
-            animation: blink 1s infinite;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="logo">SYSTEM_MONITOR</div>
-                <div class="timestamp" id="currentTime"></div>
-            </div>
-        </header>
+    <div class="analytics-dashboard">
+        <!-- 头部 -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Server Analytics</h1>
+            <p class="dashboard-subtitle">Real-time Performance Monitoring & Analytics</p>
+        </div>
 
-        <!-- 控制按钮 -->
-        <div class="controls">
-            <button class="btn" onclick="refreshData()">
+        <!-- 控制面板 -->
+        <div class="control-panel">
+            <button class="control-btn" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i>
-                REFRESH
+                Refresh Data
             </button>
-            <button class="btn" onclick="toggleAutoRefresh()">
+            <button class="control-btn" onclick="toggleAutoRefresh()">
                 <i class="fas fa-play"></i>
-                AUTO
+                Auto Refresh
+            </button>
+            <button class="control-btn" onclick="exportReport()">
+                <i class="fas fa-download"></i>
+                Export Report
             </button>
         </div>
 
-        <!-- 核心指标 -->
-        <div class="core-metrics">
-            <div class="metric">
-                <div class="metric-label">CPU</div>
-                <div class="metric-value" id="cpuUsage">0%</div>
-                <div class="metric-details">LOAD: <span id="cpuLoad">0.00</span></div>
-                <div class="progress">
-                    <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
+        <!-- 性能指标 -->
+        <div class="performance-metrics">
+            <div class="metric-widget animate-in">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="metric-info">
+                        <div class="metric-name">CPU Usage</div>
+                        <div class="metric-value" id="cpuUsage">0%</div>
+                        <div class="metric-details">
+                            <span>Load: <span id="cpuLoad">0.00</span></span>
+                            <span>Cores: <span id="cpuCores">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="circular-progress">
+                    <svg class="progress-ring" viewBox="0 0 100 100">
+                        <circle class="progress-ring-circle" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring-fill" id="cpuRing" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="progress-text" id="cpuRingText">0%</div>
                 </div>
             </div>
 
-            <div class="metric">
-                <div class="metric-label">MEMORY</div>
-                <div class="metric-value" id="memoryUsage">0%</div>
-                <div class="metric-details">USED: <span id="memoryUsed">0</span> GB</div>
-                <div class="progress">
-                    <div class="progress-bar" id="memoryProgress" style="width: 0%"></div>
+            <div class="metric-widget animate-in">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <div class="metric-info">
+                        <div class="metric-name">Memory Usage</div>
+                        <div class="metric-value" id="memoryUsage">0%</div>
+                        <div class="metric-details">
+                            <span>Used: <span id="memoryUsed">0</span> GB</span>
+                            <span>Available: <span id="memoryAvailable">0</span> GB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="circular-progress">
+                    <svg class="progress-ring" viewBox="0 0 100 100">
+                        <circle class="progress-ring-circle" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring-fill" id="memoryRing" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="progress-text" id="memoryRingText">0%</div>
                 </div>
             </div>
 
-            <div class="metric">
-                <div class="metric-label">DISK</div>
-                <div class="metric-value" id="diskUsage">0%</div>
-                <div class="metric-details">USED: <span id="diskUsed">0</span> GB</div>
-                <div class="progress">
-                    <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
+            <div class="metric-widget animate-in">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="metric-info">
+                        <div class="metric-name">Disk Usage</div>
+                        <div class="metric-value" id="diskUsage">0%</div>
+                        <div class="metric-details">
+                            <span>Used: <span id="diskUsed">0</span> GB</span>
+                            <span>Available: <span id="diskAvailable">0</span> GB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="circular-progress">
+                    <svg class="progress-ring" viewBox="0 0 100 100">
+                        <circle class="progress-ring-circle" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring-fill" id="diskRing" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="progress-text" id="diskRingText">0%</div>
                 </div>
             </div>
 
-            <div class="metric">
-                <div class="metric-label">NETWORK</div>
-                <div class="metric-value" id="networkUsage">0 KB/s</div>
-                <div class="metric-details">DOWN: <span id="networkDown">0</span> KB/s</div>
-                <div class="progress">
-                    <div class="progress-bar" id="networkProgress" style="width: 0%"></div>
+            <div class="metric-widget animate-in">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="metric-info">
+                        <div class="metric-name">Network Traffic</div>
+                        <div class="metric-value" id="networkUsage">0 KB/s</div>
+                        <div class="metric-details">
+                            <span>Upload: <span id="networkUp">0</span> KB/s</span>
+                            <span>Download: <span id="networkDown">0</span> KB/s</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="circular-progress">
+                    <svg class="progress-ring" viewBox="0 0 100 100">
+                        <circle class="progress-ring-circle" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring-fill" id="networkRing" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="progress-text" id="networkRingText">0</div>
                 </div>
             </div>
         </div>
 
-        <!-- 图表区域 -->
-        <div class="charts">
-            <div class="chart-container">
-                <div class="chart-title">CPU USAGE</div>
-                <canvas id="cpuChart"></canvas>
+        <!-- 图表网格 -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h2 class="chart-title">Performance Trends</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
             </div>
-            <div class="chart-container">
-                <div class="chart-title">MEMORY USAGE</div>
-                <canvas id="memoryChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <div class="chart-title">NETWORK I/O</div>
-                <canvas id="networkChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <div class="chart-title">DISK USAGE</div>
-                <canvas id="diskChart"></canvas>
-            </div>
-        </div>
-
-        <!-- 系统信息 -->
-        <div class="system-info">
-            <div class="info-header">SYSTEM INFORMATION</div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">HOSTNAME</div>
-                    <div class="info-value" id="hostname">-</div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h2 class="chart-title">Resource Distribution</h2>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">OS</div>
-                    <div class="info-value" id="os">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">UPTIME</div>
-                    <div class="info-value" id="uptime">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">CPU MODEL</div>
-                    <div class="info-value" id="cpuModel">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">TOTAL MEMORY</div>
-                    <div class="info-value" id="totalMemory">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">TOTAL DISK</div>
-                    <div class="info-value" id="totalDisk">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">IP ADDRESS</div>
-                    <div class="info-value" id="ipAddress">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">LAST UPDATE</div>
-                    <div class="info-value" id="lastUpdate">-</div>
+                <div class="chart-container">
+                    <canvas id="resourceChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- 进程列表 -->
-        <div class="processes">
-            <div class="processes-header">
-                <div class="processes-title">RUNNING PROCESSES</div>
-                <button class="btn" onclick="refreshProcesses()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+        <!-- 信息面板 -->
+        <div class="info-panels">
+            <div class="info-panel">
+                <div class="panel-header">
+                    <div class="chart-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h2 class="panel-title">System Information</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Hostname</div>
+                        <div class="info-value" id="hostname">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Operating System</div>
+                        <div class="info-value" id="os">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value" id="uptime">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">CPU Model</div>
+                        <div class="info-value" id="cpuModel">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total Memory</div>
+                        <div class="info-value" id="totalMemory">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total Disk</div>
+                        <div class="info-value" id="totalDisk">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">IP Address</div>
+                        <div class="info-value" id="ipAddress">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Update</div>
+                        <div class="info-value" id="lastUpdate">-</div>
+                    </div>
+                </div>
             </div>
-            <table class="processes-table">
-                <thead>
-                    <tr>
-                        <th>PROCESS</th>
-                        <th>PID</th>
-                        <th>CPU</th>
-                        <th>MEM</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="processesList">
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: #666;">
-                            LOADING...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <div class="process-table">
+                <div class="table-header">
+                    <h2 class="table-title">
+                        <i class="fas fa-list"></i>
+                        Running Processes
+                    </h2>
+                    <button class="control-btn" onclick="refreshProcesses()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+                <table class="process-list">
+                    <thead>
+                        <tr>
+                            <th>Process</th>
+                            <th>PID</th>
+                            <th>CPU</th>
+                            <th>Memory</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processesList">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #718096;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading processes...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
         // 图表实例
-        let cpuChart, memoryChart, networkChart, diskChart;
+        let performanceChart, resourceChart;
         let autoRefreshInterval = null;
-
-        // 更新时间显示
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent = 
-                now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-        }
         
         // 初始化图表
         function initializeCharts() {
-            const ctx1 = document.getElementById('cpuChart').getContext('2d');
-            const ctx2 = document.getElementById('memoryChart').getContext('2d');
-            const ctx3 = document.getElementById('networkChart').getContext('2d');
-            const ctx4 = document.getElementById('diskChart').getContext('2d');
+            const ctx1 = document.getElementById('performanceChart').getContext('2d');
+            const ctx2 = document.getElementById('resourceChart').getContext('2d');
 
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { 
-                        display: false,
-                        grid: { display: false }
+            performanceChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'CPU',
+                            data: [],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Memory',
+                            data: [],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#4a5568',
+                                font: { size: 12 }
+                            }
+                        }
                     },
-                    y: { 
-                        display: false,
-                        grid: { display: false },
-                        beginAtZero: true,
-                        max: 100
+                    scales: {
+                        x: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#64748b', font: { size: 11 } }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#64748b', font: { size: 11 } },
+                            beginAtZero: true,
+                            max: 100
+                        }
                     }
-                },
-                elements: {
-                    line: { tension: 0.4 },
-                    point: { radius: 0 }
                 }
-            };
-
-            cpuChart = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        borderColor: '#00ff88',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: chartOptions
             });
 
-            memoryChart = new Chart(ctx2, {
-                type: 'line',
+            resourceChart = new Chart(ctx2, {
+                type: 'doughnut',
                 data: {
-                    labels: [],
+                    labels: ['CPU', 'Memory', 'Disk', 'Network'],
                     datasets: [{
-                        data: [],
-                        borderColor: '#00ff88',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: chartOptions
-            });
-
-            networkChart = new Chart(ctx3, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'IN',
-                        data: [],
-                        borderColor: '#00ff88',
-                        borderWidth: 1,
-                        fill: false
-                    }, {
-                        label: 'OUT',
-                        data: [],
-                        borderColor: '#ff4444',
-                        borderWidth: 1,
-                        fill: false
+                        data: [25, 35, 45, 15],
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
-                    ...chartOptions,
-                    plugins: { legend: { display: true } },
-                    scales: { ...chartOptions.scales, y: { ...chartOptions.scales.y, max: null } }
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#4a5568',
+                                font: { size: 11 }
+                            }
+                        }
+                    }
                 }
             });
+        }
 
-            diskChart = new Chart(ctx4, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        borderColor: '#00ff88',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: chartOptions
-            });
+        // 更新环形进度条
+        function updateCircularProgress(ringId, textId, value) {
+            const circle = document.getElementById(ringId);
+            const text = document.getElementById(textId);
+            const circumference = 283; // 2 * π * 45
+            const offset = circumference - (value / 100) * circumference;
+            
+            circle.style.strokeDashoffset = offset;
+            text.textContent = value + '%';
         }
 
         // 模拟服务器数据
@@ -592,7 +779,7 @@
                     pid: 1000 + i,
                     cpu: (Math.random() * 4).toFixed(1),
                     memory: (Math.random() * 0.8).toFixed(1),
-                    status: Math.random() > 0.1 ? 'online' : 'offline'
+                    status: Math.random() > 0.1 ? 'active' : 'inactive'
                 }))
             };
         }
@@ -601,56 +788,48 @@
         function updateCharts(data) {
             const now = new Date().toLocaleTimeString();
             
-            if (cpuChart.data.labels.length > 10) {
-                cpuChart.data.labels.shift();
-                cpuChart.data.datasets[0].data.shift();
-                
-                memoryChart.data.labels.shift();
-                memoryChart.data.datasets[0].data.shift();
-                
-                networkChart.data.labels.shift();
-                networkChart.data.datasets[0].data.shift();
-                networkChart.data.datasets[1].data.shift();
-                
-                diskChart.data.labels.shift();
-                diskChart.data.datasets[0].data.shift();
+            if (performanceChart.data.labels.length > 10) {
+                performanceChart.data.labels.shift();
+                performanceChart.data.datasets[0].data.shift();
+                performanceChart.data.datasets[1].data.shift();
             }
 
-            cpuChart.data.labels.push(now);
-            cpuChart.data.datasets[0].data.push(data.cpu.usage);
-            cpuChart.update('none');
+            performanceChart.data.labels.push(now);
+            performanceChart.data.datasets[0].data.push(data.cpu.usage);
+            performanceChart.data.datasets[1].data.push(data.memory.usage);
+            performanceChart.update('none');
 
-            memoryChart.data.labels.push(now);
-            memoryChart.data.datasets[0].data.push(data.memory.usage);
-            memoryChart.update('none');
-
-            networkChart.data.labels.push(now);
-            networkChart.data.datasets[0].data.push(parseFloat(data.network.up));
-            networkChart.data.datasets[1].data.push(parseFloat(data.network.down));
-            networkChart.update('none');
-
-            diskChart.data.labels.push(now);
-            diskChart.data.datasets[0].data.push(data.disk.usage);
-            diskChart.update('none');
+            // 更新环形图
+            resourceChart.data.datasets[0].data = [
+                data.cpu.usage,
+                data.memory.usage,
+                data.disk.usage,
+                Math.min(100, data.network.usage * 2)
+            ];
+            resourceChart.update('none');
         }
 
         // 更新状态卡片
         function updateStatusCards(data) {
             document.getElementById('cpuUsage').textContent = data.cpu.usage.toFixed(1) + '%';
-            document.getElementById('cpuProgress').style.width = data.cpu.usage + '%';
+            updateCircularProgress('cpuRing', 'cpuRingText', data.cpu.usage);
             document.getElementById('cpuLoad').textContent = data.cpu.load;
+            document.getElementById('cpuCores').textContent = data.cpu.cores;
 
             document.getElementById('memoryUsage').textContent = data.memory.usage.toFixed(1) + '%';
-            document.getElementById('memoryProgress').style.width = data.memory.usage + '%';
+            updateCircularProgress('memoryRing', 'memoryRingText', data.memory.usage);
             document.getElementById('memoryUsed').textContent = data.memory.used;
+            document.getElementById('memoryAvailable').textContent = data.memory.available;
 
             document.getElementById('diskUsage').textContent = data.disk.usage.toFixed(1) + '%';
-            document.getElementById('diskProgress').style.width = data.disk.usage + '%';
+            updateCircularProgress('diskRing', 'diskRingText', data.disk.usage);
             document.getElementById('diskUsed').textContent = data.disk.used;
+            document.getElementById('diskAvailable').textContent = data.disk.available;
 
             const networkUsage = Math.max(data.network.up, data.network.down);
             document.getElementById('networkUsage').textContent = networkUsage.toFixed(1) + ' KB/s';
-            document.getElementById('networkProgress').style.width = Math.min(100, networkUsage) + '%';
+            updateCircularProgress('networkRing', 'networkRingText', Math.min(100, networkUsage));
+            document.getElementById('networkUp').textContent = data.network.up;
             document.getElementById('networkDown').textContent = data.network.down;
 
             document.getElementById('hostname').textContent = data.server.hostname;
@@ -667,20 +846,15 @@
             
             data.processes.forEach(process => {
                 const row = document.createElement('tr');
-                const statusClass = process.status === 'online' ? 'status-online' : 'status-offline';
-                const statusText = process.status === 'online' ? 'ONLINE' : 'OFFLINE';
+                const statusClass = process.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = process.status === 'active' ? 'ACTIVE' : 'INACTIVE';
                 
                 row.innerHTML = `
                     <td>${process.name}</td>
                     <td>${process.pid}</td>
                     <td>${process.cpu}%</td>
                     <td>${process.memory}%</td>
-                    <td>
-                        <div class="status">
-                            <div class="status-dot ${statusClass}"></div>
-                            ${statusText}
-                        </div>
-                    </td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 `;
                 processesList.appendChild(row);
             });
@@ -691,7 +865,6 @@
             const data = generateMockData();
             updateStatusCards(data);
             updateCharts(data);
-            updateTime();
         }
 
         // 切换自动刷新
@@ -701,11 +874,37 @@
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
-                button.innerHTML = '<i class="fas fa-play"></i> AUTO';
+                button.innerHTML = '<i class="fas fa-play"></i> Auto Refresh';
             } else {
-                autoRefreshInterval = setInterval(refreshData, 3000);
-                button.innerHTML = '<i class="fas fa-stop"></i> STOP';
+                autoRefreshInterval = setInterval(refreshData, 5000);
+                button.innerHTML = '<i class="fas fa-stop"></i> Stop Refresh';
             }
+        }
+
+        // 导出报告
+        function exportReport() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                serverInfo: {
+                    hostname: document.getElementById('hostname').textContent,
+                    os: document.getElementById('os').textContent,
+                    uptime: document.getElementById('uptime').textContent
+                },
+                metrics: {
+                    cpu: document.getElementById('cpuUsage').textContent,
+                    memory: document.getElementById('memoryUsage').textContent,
+                    disk: document.getElementById('diskUsage').textContent,
+                    network: document.getElementById('networkUsage').textContent
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `server-analytics-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         // 刷新进程列表
@@ -717,10 +916,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeCharts();
             refreshData();
-            setInterval(updateTime, 1000);
-            
-            // 初始自动刷新
-            autoRefreshInterval = setInterval(refreshData, 3000);
         });
     </script>
 </body>
