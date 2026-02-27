@@ -1,0 +1,11 @@
+{
+  "name": "server-probe",
+  "compatibility_date": "2026-02-27",
+  "build": {
+    "command": "echo 'Static site - no build required'",
+    "publish": "."
+  },
+  "env": {
+    "NODE_VERSION": "20"
+  }
+}

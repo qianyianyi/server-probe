@@ -1,0 +1,23 @@
+# Cloudflare Pages Configuration
+
+## Build Settings
+framework: none
+
+## Build Command
+build_command: ""
+
+## Publish Directory
+publish: "."
+
+## Environment Variables
+[env]
+  NODE_VERSION = "20"
+
+## Headers for Security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
